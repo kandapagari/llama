@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
+# This software may be used and distributed according to the terms of the Llama 2
+# Community License Agreement.
 
 import fire
 
@@ -29,11 +31,11 @@ def main(
         """A brief message congratulating the team on the launch:
 
         Hi everyone,
-        
+
         I just """,
         # Few shot prompt (providing a few examples before asking model to complete more);
         """Translate English to French:
-        
+
         sea otter => loutre de mer
         peppermint => menthe poivrée
         plush girafe => girafe peluche

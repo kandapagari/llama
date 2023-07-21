@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
+# This software may be used and distributed according to the terms of the Llama 2
+# Community License Agreement.
 
 import json
 import os
@@ -11,10 +13,8 @@ from typing import List, Literal, Optional, Tuple, TypedDict
 import torch
 import torch.nn.functional as F
 from fairscale.nn.model_parallel.initialize import (
-    get_model_parallel_rank,
-    initialize_model_parallel,
-    model_parallel_is_initialized,
-)
+    get_model_parallel_rank, initialize_model_parallel,
+    model_parallel_is_initialized)
 
 from llama.model import ModelArgs, Transformer
 from llama.tokenizer import Tokenizer
@@ -44,9 +44,14 @@ Dialog = List[Message]
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
 DEFAULT_SYSTEM_PROMPT = """\
-You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+You are a helpful, respectful and honest assistant. Always answer as helpfully as possible,
+while being safe. Your answers should not include any harmful, unethical, racist, sexist,
+toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased
+and positive in nature.
 
-If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."""
+If a question does not make any sense, or is not factually coherent, explain why instead of
+answering something not correct. If you don't know the answer to a question, please don't share
+false information."""
 
 
 class Llama:
@@ -79,7 +84,8 @@ class Llama:
         assert len(checkpoints) > 0, f"no checkpoint files found in {ckpt_dir}"
         assert model_parallel_size == len(
             checkpoints
-        ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {model_parallel_size}"
+        ), f"Loading a checkpoint for MP={len(checkpoints)} but world size\
+              is {model_parallel_size}"
         ckpt_path = checkpoints[get_model_parallel_rank()]
         checkpoint = torch.load(ckpt_path, map_location="cpu")
         with open(Path(ckpt_dir) / "params.json", "r") as f:
@@ -135,9 +141,9 @@ class Llama:
         for cur_pos in range(min_prompt_len, total_len):
             logits = self.model.forward(tokens[:, prev_pos:cur_pos], prev_pos)
             if logprobs:
-                token_logprobs[:, prev_pos + 1 : cur_pos + 1] = -F.cross_entropy(
+                token_logprobs[:, prev_pos + 1: cur_pos + 1] = -F.cross_entropy(
                     input=logits.transpose(1, 2),
-                    target=tokens[:, prev_pos + 1 : cur_pos + 1],
+                    target=tokens[:, prev_pos + 1: cur_pos + 1],
                     reduction="none",
                     ignore_index=pad_id,
                 )
@@ -166,10 +172,10 @@ class Llama:
         for i, toks in enumerate(tokens.tolist()):
             # cut to max gen len
             start = 0 if echo else len(prompt_tokens[i])
-            toks = toks[start : len(prompt_tokens[i]) + max_gen_len]
+            toks = toks[start: len(prompt_tokens[i]) + max_gen_len]
             probs = None
             if logprobs:
-                probs = token_logprobs[i][start : len(prompt_tokens[i]) + max_gen_len]
+                probs = token_logprobs[i][start: len(prompt_tokens[i]) + max_gen_len]
             # cut to eos tok if any
             if self.tokenizer.eos_id in toks:
                 eos_idx = toks.index(self.tokenizer.eos_id)
@@ -247,7 +253,8 @@ class Llama:
             dialog_tokens: List[int] = sum(
                 [
                     self.tokenizer.encode(
-                        f"{B_INST} {(prompt['content']).strip()} {E_INST} {(answer['content']).strip()} ",
+                        f"{B_INST} {(prompt['content']).strip()} {E_INST}\
+                              {(answer['content']).strip()} ",
                         bos=True,
                         eos=True,
                     )

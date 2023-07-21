@@ -1,18 +1,18 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
+# This software may be used and distributed according to the terms of the Llama 2
+# Community License Agreement.
 
 import math
 from dataclasses import dataclass
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 import fairscale.nn.model_parallel.initialize as fs_init
 import torch
 import torch.nn.functional as F
-from fairscale.nn.model_parallel.layers import (
-    ColumnParallelLinear,
-    ParallelEmbedding,
-    RowParallelLinear,
-)
+from fairscale.nn.model_parallel.layers import (ColumnParallelLinear,
+                                                ParallelEmbedding,
+                                                RowParallelLinear)
 from torch import nn
 
 
@@ -161,8 +161,8 @@ class Attention(nn.Module):
         self.cache_k = self.cache_k.to(xq)
         self.cache_v = self.cache_v.to(xq)
 
-        self.cache_k[:bsz, start_pos : start_pos + seqlen] = xk
-        self.cache_v[:bsz, start_pos : start_pos + seqlen] = xv
+        self.cache_k[:bsz, start_pos: start_pos + seqlen] = xk
+        self.cache_v[:bsz, start_pos: start_pos + seqlen] = xv
 
         keys = self.cache_k[:bsz, : start_pos + seqlen]
         values = self.cache_v[:bsz, : start_pos + seqlen]
@@ -272,7 +272,7 @@ class Transformer(nn.Module):
         _bsz, seqlen = tokens.shape
         h = self.tok_embeddings(tokens)
         self.freqs_cis = self.freqs_cis.to(h.device)
-        freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
+        freqs_cis = self.freqs_cis[start_pos: start_pos + seqlen]
 
         mask = None
         if seqlen > 1:
